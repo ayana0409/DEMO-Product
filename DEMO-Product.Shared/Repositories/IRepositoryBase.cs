@@ -1,50 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace DEMO_Product.Shared.Repositories
 {
-    public interface IRepositoryQueryBase<T> where T : class
+    public interface IRepositoryBase<T> where T : class
     {
-        IQueryable<T> FindAll(bool trackChanges = false);
-        IQueryable<T> FindAll(bool trackChanges = false, params Expression<Func<T, object>>[] includeProperties);
-        IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges = false);
-        IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges = false,
-            params Expression<Func<T, object>>[] includeProperties);
-        Task<T?> GetByIdAsync(long id);
-        Task<T?> GetByIdAsync(long id, params Expression<Func<T, object>>[] includeProperties);
-    }
-    public interface IRepositoryBase<T> : IRepositoryQueryBase<T>
-        where T : class
-    {
-        void Create(T entity);
-        Task<long> CreateAsync(T entity);
-        IList<long> CreateList(IEnumerable<T> entities);
-        Task<IList<long>> CreateListAsync(IEnumerable<T> entities);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null);
+        Task<T?> GetSigleAsync(Expression<Func<T, bool>> expression);
+        Task CreateAsync(T entity);
         void Update(T entity);
-        Task UpdateAsync(T entity);
-        void UpdateList(IEnumerable<T> entities);
-        Task UpdateListAsync(IEnumerable<T> entities);
         void Delete(T entity);
-        Task DeleteAsync(T entity);
-        void DeleteList(IEnumerable<T> entities);
-        Task DeleteListAsync(IEnumerable<T> entities);
-        Task<int> SaveChangeAsync();
-
-        Task<IDbContextTransaction> BeginTransactionAsync();
-        Task EndTransactionAsync();
-        Task RollbackTransactionAsync();
-    }
-    public interface IRepositoryQueryBase<T, TContext>
-        : IRepositoryQueryBase<T>
-        where T : class
-        where TContext : DbContext
-    {
-    }
-    public interface IRepositoryBaseAsync<T, TContext>
-        : IRepositoryBase<T>
-        where T : class
-        where TContext : DbContext
-    {
     }
 }

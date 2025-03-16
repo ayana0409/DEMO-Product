@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DEMO-Product.Application\DEMO-Product.Application.csproj" />
+    <ProjectReference Include="..\DEMO-Product.Domain\DEMO-Product.Domain.csproj" />
     <ProjectReference Include="..\DEMO-Product.Shared\DEMO-Product.Shared.csproj" />
   </ItemGroup>
 

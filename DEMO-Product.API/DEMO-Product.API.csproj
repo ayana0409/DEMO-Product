@@ -24,8 +24,4 @@
     <ProjectReference Include="..\DEMO-Product.Infrastructure\DEMO-Product.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>

@@ -1,98 +1,46 @@
-﻿using DEMO_Product.Shared.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DEMO_Product.Shared.Repositories
 {
-    public class RepositoryBase<T, TContext> : RepositoryQueryBase<T, TContext>,
-        IRepositoryBaseAsync<T, TContext> where T : BaseEntity
+    public class RepositoryBase<T, TContext> : IRepositoryBase<T> where T : class
         where TContext : DbContext
     {
-        private readonly TContext _dbContext;
-
-        public RepositoryBase(TContext dbContext) : base(dbContext)
+        private readonly TContext _applicationDbContext;
+        public RepositoryBase(TContext applicationDbContext)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _applicationDbContext = applicationDbContext;
         }
-
-        public Task<IDbContextTransaction> BeginTransactionAsync() => _dbContext.Database.BeginTransactionAsync();
-
-        public async Task EndTransactionAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null)
         {
-            await SaveChangeAsync();
-            await _dbContext.Database.CommitTransactionAsync();
+            IQueryable<T> query = _applicationDbContext.Set<T>();
+
+            if (expression == null)
+                return await query.AsNoTracking().ToListAsync();
+
+            return await query.AsNoTracking().Where(expression).ToListAsync();
         }
-
-        public Task RollbackTransactionAsync() => _dbContext.Database.RollbackTransactionAsync();
-
-        public void Create(T entity) => _dbContext.Set<T>().Add(entity);
-
-        public async Task<long> CreateAsync(T entity)
+        public async Task<T?> GetSigleAsync(Expression<Func<T, bool>> expression)
         {
-            await _dbContext.Set<T>().AddAsync(entity);
-            await SaveChangeAsync();
-            return entity.Id;
+            return await _applicationDbContext.Set<T>().AsNoTracking()
+                .FirstOrDefaultAsync(expression);
         }
-
-        public IList<long> CreateList(IEnumerable<T> entities)
+        public async Task CreateAsync(T entity)
         {
-            _dbContext.Set<T>().AddRange(entities);
-            return entities.Select(x => x.Id).ToList();
+            await _applicationDbContext.Set<T>().AddAsync(entity);
+            await _applicationDbContext.SaveChangesAsync();
         }
-
-        public async Task<IList<long>> CreateListAsync(IEnumerable<T> entities)
-        {
-            await _dbContext.Set<T>().AddRangeAsync(entities);
-            await SaveChangeAsync();
-            return entities.Select(x => x.Id).ToList();
-        }
-
         public void Update(T entity)
         {
-            if (_dbContext.Entry(entity).State == EntityState.Unchanged) return;
-
-            T? exist = _dbContext.Set<T>().Find(entity.Id);
-            if (exist == null) return;
-
-            _dbContext.Entry(exist).CurrentValues.SetValues(entity);
+            _applicationDbContext.Set<T>().Attach(entity);
+            _applicationDbContext.Entry(entity).State = EntityState.Modified;
+            _applicationDbContext.SaveChanges();
         }
-
-        public async Task UpdateAsync(T entity)
+        public void Delete(T entity)
         {
-            if (_dbContext.Entry(entity).State == EntityState.Unchanged) return;
-
-            T? exist = _dbContext.Set<T>().Find(entity.Id);
-            if (exist == null) return;
-
-            _dbContext.Entry(exist).CurrentValues.SetValues(entity);
-            await SaveChangeAsync();
+            _applicationDbContext.Set<T>().Attach(entity);
+            _applicationDbContext.Entry(entity).State = EntityState.Deleted;
+            _applicationDbContext.SaveChanges();
         }
-
-        public void UpdateList(IEnumerable<T> entities) => _dbContext.Set<T>().AddRangeAsync(entities);
-
-        public async Task UpdateListAsync(IEnumerable<T> entities)
-        {
-            await _dbContext.Set<T>().AddRangeAsync(entities);
-            await SaveChangeAsync();
-        }
-
-        public void Delete(T entity) => _dbContext.Set<T>().Remove(entity);
-
-        public async Task DeleteAsync(T entity)
-        {
-            _dbContext.Set<T>().Remove(entity);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public void DeleteList(IEnumerable<T> entities) => _dbContext.Set<T>().RemoveRange(entities);
-
-        public async Task DeleteListAsync(IEnumerable<T> entities)
-        {
-            _dbContext.Set<T>().RemoveRange(entities);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public Task<int> SaveChangeAsync() => _dbContext.SaveChangesAsync();
-
     }
 }
