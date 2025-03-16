@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using DEMO_Product.Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
-namespace DEMO_Product.Shared.Repositories
+namespace DEMO_Product.Infrastructure.Repositories
 {
     public class RepositoryBase<T, TContext> : IRepositoryBase<T> where T : class
         where TContext : DbContext
