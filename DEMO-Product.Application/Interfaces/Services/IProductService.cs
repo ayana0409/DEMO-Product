@@ -7,8 +7,8 @@ namespace DEMO_Product.Application.Interfaces.Services
     {
         Task<List<ProductDto>> GetAllProducts();
         Task<ProductDto> GetProductById(long id);
-        Task<long> AddProduct(CreateOrUpdateProductDto model);
-        Task<ProductDto> UpdateProduct(long id, CreateOrUpdateProductDto model);
+        Task<long> AddProduct(CreateProductDto model);
+        Task<ProductDto> UpdateProduct(long id, UpdateProductDto model);
         Task DeleteProduct(long id);
     }
 }

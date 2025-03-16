@@ -9,7 +9,11 @@ namespace DEMO_Product.Application.Mappings
         public MappingProfile()
         {
             CreateMap<Product, ProductDto>().ReverseMap();
-            CreateMap<Product, CreateOrUpdateProductDto>().ReverseMap();
+            CreateMap<Product, CreateProductDto>().ReverseMap();
+            CreateMap<Product, UpdateProductDto>().ReverseMap()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) =>
+                    srcMember != null && !(srcMember is string str && string.IsNullOrWhiteSpace(str))
+                )); ;
         }
     }
 }

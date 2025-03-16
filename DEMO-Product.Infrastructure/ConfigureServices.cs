@@ -22,7 +22,7 @@ namespace DEMO_Product.Infrastructure
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
             services.AddScoped<ProductContextSeed>();
-            services.AddAutoMapper(config => config.AddProfile(new MappingProfile()));
+            services.AddAutoMapper(typeof(MappingProfile));
             return services;
         }
 

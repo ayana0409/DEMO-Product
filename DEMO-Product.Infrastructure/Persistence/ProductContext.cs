@@ -36,11 +36,11 @@ namespace DEMO_Product.Infrastructure.Persistence
             {
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                    entry.Entity.CreatedAt = DateTimeOffset.UtcNow;
                 }
                 if (entry.State == EntityState.Modified)
                 {
-                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                    entry.Entity.UpdatedAt = DateTimeOffset.UtcNow;
                 }
             }
         }

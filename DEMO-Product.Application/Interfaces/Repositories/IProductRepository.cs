@@ -5,5 +5,6 @@ namespace DEMO_Product.Application.Interfaces.Repositories
 {
     public interface IProductRepository : IRepositoryBase<Product>
     {
+
     }
 }

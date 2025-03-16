@@ -27,17 +27,18 @@ namespace DEMO_Product.Application.Services
         public async Task<ProductDto> GetProductById(long id)
         {
             var products = await _repository
-                .GetSigleAsync(p => p.Id.Equals(id) && p.IsActive);
+                .GetSigleAsync(p => p.Id.Equals(id) && p.IsActive)
+                ?? throw new NotFoundException();
             return _mapper.Map<ProductDto>(products);
         }
 
-        public async Task<long> AddProduct(CreateOrUpdateProductDto model)
+        public async Task<long> AddProduct(CreateProductDto model)
         {
             var product = _mapper.Map<Product>(model);
             await _repository.CreateAsync(product);
             return product.Id;
         }
-        public async Task<ProductDto> UpdateProduct(long id, CreateOrUpdateProductDto model)
+        public async Task<ProductDto> UpdateProduct(long id, UpdateProductDto model)
         {
             var existProduct = await _repository.GetSigleAsync(p => p.Id.Equals(id))
                 ?? throw new NotFoundException();
