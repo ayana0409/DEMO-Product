@@ -1,3 +1,4 @@
+using DEMO_Product.Application;
 using DEMO_Product.Infrastructure;
 using DEMO_Product.Infrastructure.Persistence;
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddDependencyInjection();
+builder.Services.AddApplicationService();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

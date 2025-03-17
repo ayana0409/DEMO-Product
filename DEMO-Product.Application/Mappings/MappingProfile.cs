@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DEMO_Product.Application.Requests.Products;
 using DEMO_Product.Domain.Entities;
 using DEMO_Product.Shared.DTO;
 
@@ -10,10 +11,11 @@ namespace DEMO_Product.Application.Mappings
         {
             CreateMap<Product, ProductDto>().ReverseMap();
             CreateMap<Product, CreateProductDto>().ReverseMap();
+            CreateMap<Product, CreateProductCommand>().ReverseMap();
             CreateMap<Product, UpdateProductDto>().ReverseMap()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) =>
                     srcMember != null && !(srcMember is string str && string.IsNullOrWhiteSpace(str))
-                )); ;
+                ));
         }
     }
 }

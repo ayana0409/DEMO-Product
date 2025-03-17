@@ -1,6 +1,8 @@
 ﻿using DEMO_Product.Application.Interfaces.Services;
+using DEMO_Product.Application.Requests.Products;
 using DEMO_Product.Domain.Exception;
 using DEMO_Product.Shared.DTO;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,15 +13,17 @@ namespace DEMO_Product.API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        public ProductsController(IProductService productService)
+        private readonly IMediator _mediator;
+        public ProductsController(IProductService productService, IMediator mediator)
         {
             _productService = productService;
+            _mediator = mediator;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
-            => Ok(await _productService.GetAllProducts());
+            => Ok(await _mediator.Send(new GetAllProductQuery()));
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -28,7 +32,7 @@ namespace DEMO_Product.API.Controllers
         {
             try
             {
-                return Ok(await _productService.GetProductById(id));
+                return Ok(await _mediator.Send(new GetProductByIdQuery{Id = id}));
             }
             catch (NotFoundException)
             {
@@ -39,12 +43,11 @@ namespace DEMO_Product.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto dto)
+        public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
         {
             try
             {
-                var createdProduct = await _productService.AddProduct(dto);
-                return CreatedAtAction(nameof(CreateProduct), createdProduct);
+                return CreatedAtAction(nameof(CreateProduct), await _mediator.Send(command));
             }
             catch (ArgumentException ex)
             {
@@ -56,7 +59,7 @@ namespace DEMO_Product.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
         {
             try
             {
